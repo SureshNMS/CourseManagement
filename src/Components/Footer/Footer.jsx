@@ -1,5 +1,5 @@
 import React from "react";
-import Logo from '../../assets/course-management-logo-dark.png'; // Adjust the path as necessary
+import Logo from '../../Assets/course-management-logo-dark.png'; // Adjust the path as necessary
 
 function Footer() {
   return (
