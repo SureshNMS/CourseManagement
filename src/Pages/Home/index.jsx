@@ -3,6 +3,10 @@ import Course from "../../Components/Courses/Course"
 import CourseData from "../../Utils/AllCoursesData"
 import LogosData from "../../Utils/LogosData"
 import { useNavigate, Link, data } from "react-router-dom"
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, addDoc } from "firebase/firestore";
+
+
 
 function Home() {
   const navigate = useNavigate();
