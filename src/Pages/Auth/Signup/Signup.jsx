@@ -18,14 +18,12 @@ function Signup() {
 
   const [registration, setRegistration] = useState({
     name: "",
-    role: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
   const [errors, setErrors] = useState({
     name: "",
-    role: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -34,7 +32,6 @@ function Signup() {
 
   const validator = {
     name: (val) => (val.trim() ? "" : "Name is Required"),
-    role: (val) => (val.trim() ? "" : "Role is Required"),
     email: (val) => {
       if (!val.trim()) return "Email is Required";
       const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
@@ -73,7 +70,6 @@ function Signup() {
 
     const newErrors = {
       name: validator.name(registration.name),
-      role: validator.role(registration.role),
       email: validator.email(registration.email),
       password: validator.password(registration.password),
       confirmPassword: validator.confirmPassword(
@@ -97,14 +93,12 @@ function Signup() {
 
         await setDoc(doc(db, "users", user.uid), {
           name: registration.name,
-          role: registration.role,
           email: registration.email,
           password: hashedPassword,
         });
         setSuccess(true);
         setRegistration({
           name: "",
-          role: "",
           email: "",
           password: "",
           confirmPassword: "",
@@ -244,23 +238,6 @@ function Signup() {
                 placeholder="Enter your name"
               />
               {errors.name && <p className="text-red-500">{errors.name}</p>}
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2" htmlFor="role">
-                Role
-              </label>
-              <select
-                id="role"
-                name="role"
-                value={registration.role}
-                onChange={handleInput}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select a role</option>
-                <option value="admin">Admin</option>
-                <option value="user">User</option>
-              </select>
-              {errors.role && <p className="text-red-500">{errors.role}</p>}
             </div>
             <div className="mb-4">
               <label
