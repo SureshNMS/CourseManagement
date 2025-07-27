@@ -10,6 +10,7 @@ import Courses from './Pages/Course/AllCourses.jsx'
 import About from './Pages/About/About.jsx'
 import Contact from './Pages/Contact/Contact.jsx'
 import CourseDetails from './Pages/Course/DetailedCourse.jsx'
+import ProtectedRoute from './Contexts/ProtectedRoute.jsx'
 
 
 function App() {
@@ -17,7 +18,11 @@ function App() {
     <>
       <Header />
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+          } />
         <Route path="/auth/login" element={<Login />} />
         <Route path="/auth/signup" element={<Signup />} />
         <Route path="/course" element={<Courses />} />

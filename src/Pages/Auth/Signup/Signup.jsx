@@ -15,12 +15,6 @@ import {
 
 function Signup() {
   const navigate = useNavigate();
-  const {user} = useUser();
-  useEffect(() => {
-      if(user) {
-        navigate("/");
-      }
-    }, [user, navigate]);
 
   const [registration, setRegistration] = useState({
     name: "",

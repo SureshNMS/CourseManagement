@@ -1,53 +1,48 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "../../firebase-config"; // Adjust path
+import { auth, db } from "../../firebase-config";
 
 const UserContext = createContext();
 
-
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // 🔁 new
-  
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-  const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-    if (currentUser) {
-      try {
-        const docRef = doc(db, "users", currentUser.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        try {
+          const docRef = doc(db, "users", currentUser.uid);
+          const docSnap = await getDoc(docRef);
+
           setUser({
             uid: currentUser.uid,
             email: currentUser.email,
-            name: docSnap.data().name,
+            name: docSnap.exists() ? docSnap.data()?.name || "Guest" : "Guest",
           });
-        } else {
+        } catch (err) {
+          console.error("Error fetching user doc:", err);
           setUser({
             uid: currentUser.uid,
             email: currentUser.email,
             name: "Guest",
           });
         }
-      } catch (err) {
-        console.error("Error fetching user doc:", err);
-        setUser({
-          uid: currentUser.uid,
-          email: currentUser.email,
-          name: "Guest",
-        });
+      } else {
+        setUser(null);
       }
-    } else {
-      setUser(null);
-    }
-    setLoading(false); // ✅ done loading
-  });
+      setLoading(false);
+    });
 
-  return () => unsubscribe();
-}, []);
+    return () => unsubscribe();
+  }, []);
+
+  // Show loader while fetching auth state
+  if (loading) return <p>Loading...</p>;
 
   return (
-    <UserContext.Provider value={{ user, setUser, loading }}>
+    <UserContext.Provider value={{ user, setUser }}>
       {children}
     </UserContext.Provider>
   );

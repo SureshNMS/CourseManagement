@@ -1,27 +1,37 @@
 // src/components/UIUXCourse.jsx
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { useParams, Link, data } from "react-router-dom";
 import CourseDetailedData from "../../Utils/DetailedCourseData";
 import AllCourseData from "../../Utils/AllCoursesData";
 import { FaArrowLeft, FaBackward } from "react-icons/fa";
-import { useEffect } from "react";
+import {db} from "../../../firebase-config";
+import { collection, doc, getDocs } from "firebase/firestore";
 
 export default function CourseDetails() {
   const { category } = useParams();
   const courseLevel = AllCourseData[5];
   const course = CourseDetailedData.find((section) => section.category === category);
 
-  useEffect(() => {
-    fetch('http://localhost:3000/coursedetails/category/'+category)
-    .then(data => {
-      return data.json();
-    })
-    .then(data => {
-      console.log("Category Course", data)
-    })
-  })
+const [courses, setCourses] = useState([]);
+  
+    useEffect(() => {
+      async function fetchCourses() {
+        try {
+          const querySnashot = await getDocs(collection(db, "courses"));
+          const CourseList = querySnashot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setCourses(CourseList)
+        }
+        catch(err) {
+          console.error("Error fetching courses:", err);
+        }      
+      }
+      fetchCourses();
+    }, []);
 
-  if (!course) {
+  if (!courses) {
     return <div className="text-black p-6">This "{category}" category data not found</div>;
   }
   return (
@@ -60,7 +70,7 @@ export default function CourseDetails() {
 
       {/* Lessons Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
-        {CourseDetailedData.map((section) => (
+        {courses.map((section) => (
           <div
             key={section.id}
             className="bg-white text-black p-6 rounded-xl shadow-md"

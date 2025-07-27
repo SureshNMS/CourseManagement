@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useUser } from "../../../Contexts/UserContext";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "../../../../firebase-config";
-import { getDoc, doc } from "firebase/firestore";
+import { auth } from "../../../../firebase-config";
 
 function Login() {
+  const { user, loading } = useUser();
   const navigate = useNavigate();
-  const {user} = useUser();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  useEffect(() => {
-    if(user) {
-      navigate("/");
-    }
-  }, [user, navigate]);
+  // ✅ Redirect only if user is already logged in
+
 
   const [loginForm, setLoginForm] = useState({
     email: "",
@@ -32,7 +30,7 @@ function Login() {
     setErrors("");
     setSuccessMessage("");
   }
-  
+
   const userLogin = async (e) => {
     e.preventDefault();
 
@@ -42,16 +40,16 @@ function Login() {
         loginForm.email,
         loginForm.password
       );
-      setSuccessMessage(`Welcome, ${user?.name}! Login successful! Redirecting...`);
+      setSuccessMessage(
+        `Welcome, ${user?.name}! Login successful! Redirecting...`
+      );
       setErrors("");
 
       localStorage.setItem("isLoggedIn", "true");
       setTimeout(() => {
         navigate("/");
       }, 2500);
-
-    } 
-    catch (error) {
+    } catch (error) {
       console.log("Login Error:", error);
       let message = "";
       switch (error.code) {

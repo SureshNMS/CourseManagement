@@ -1,19 +1,31 @@
-import React from "react";
+import React, {useState} from "react";
 import Courses from "../../Components/Courses/Course";
 import CourseData from "../../Utils/AllCoursesData";
 import { useEffect } from "react";
-import { data } from "react-router-dom";
+import {db} from "../../../firebase-config";
+import { collection, doc, getDocs } from "firebase/firestore";
 
 function Course() {
-  useEffect(() => {
-    fetch('http://localhost:3000/course/allcourses')
-    .then(data => {
-      return data.json();
-    })
-    .then(data => {
-      console.log("All courses received", data);
-    })
-  })
+
+  const [courses, setCourses] = useState([]);
+  
+    useEffect(() => {
+      async function fetchCourses() {
+        try {
+          const querySnashot = await getDocs(collection(db, "courses"));
+          const CourseList = querySnashot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setCourses(CourseList)
+        }
+        catch(err) {
+          console.error("Error fetching courses:", err);
+        }      
+      }
+      fetchCourses();
+    }, []);
+
   return (
     <>
       <section className="container px-4 py-12">
@@ -33,7 +45,7 @@ function Course() {
         </div>
       
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
-        {CourseData.map((course) => (
+        {courses.map((course) => (
           <Courses key={course.id} courses={course} />
         ))}
       </div>

@@ -1,24 +1,43 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import Course from "../../Components/Courses/Course"
-import CourseData from "../../Utils/AllCoursesData"
 import LogosData from "../../Utils/LogosData"
 import { useNavigate, Link, data } from "react-router-dom"
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import {db} from "../../../firebase-config";
+import { collection, doc, getDocs } from "firebase/firestore";
 
 
 
 function Home() {
   const navigate = useNavigate();
+
+  const [courses, setCourses] = useState([]);
+
   useEffect(() => {
-    fetch('http://localhost:3000/course/allcourses')
-    .then(data => {
-      return data.json()
-    })
-    .then(data => {
-      console.log("All courses from server:", data);
-    });
-  })
+    async function fetchCourses() {
+      try {
+        const querySnashot = await getDocs(collection(db, "courses"));
+        const CourseList = querySnashot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setCourses(CourseList)
+      }
+      catch(err) {
+        console.error("Error fetching courses:", err);
+      }      
+    }
+    fetchCourses();
+  }, []);
+
+  // useEffect(() => {
+  //   fetch('http://localhost:3000/course/allcourses')
+  //   .then(data => {
+  //     return data.json()
+  //   })
+  //   .then(data => {
+  //     console.log("All courses from server:", data);
+  //   });
+  // })
   return (
     <>
       <div className="container">
@@ -88,7 +107,7 @@ function Home() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
             {
-              CourseData.slice(0, 6).map(course =>(
+              courses.slice(0, 6).map(course =>(
                 <Course key = {course.id} courses = {course} />
               ))
             }
